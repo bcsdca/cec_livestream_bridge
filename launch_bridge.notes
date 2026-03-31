@@ -1,0 +1,10 @@
+
+321  vi ~/Library/LaunchAgents/com.cecbroadcast.bridge.plist
+  322  launchctl load ~/Library/LaunchAgents/com.cecbroadcast.bridge.plist
+  323  launchctl list |grep bridge
+  324  launchctl start com.cecbroadcast.bridge
+  325  launchctl stop com.cecbroadcast.bridge
+
+cecbroadcast@CECs-Mac-mini-2 cec_livestream_bridge % launchctl unload ~/Library/LaunchAgents/com.cecbroadcast.bridge.plist
+cecbroadcast@CECs-Mac-mini-2 cec_livestream_bridge % launchctl load ~/Library/LaunchAgents/com.cecbroadcast.bridge.plist 
+
