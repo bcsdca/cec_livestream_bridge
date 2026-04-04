@@ -63,3 +63,20 @@ To github.com:bcsdca/cec_livestream_bridge.git
  * [new branch]      main -> main
 cecbroadcast@CECs-Mac-mini-2 cec_livestream_bridge % 
 
+cecbroadcast@CECs-Mac-mini-2 cec_livestream_bridge % history | grep git
+  660  git rm -r --cached node_modules
+  661  git status
+  662  git ls-files | grep config.js
+  663  git commit -m "Stop tracking config.js node_modules"
+  664  git ls-files | grep config.js
+  665  git ls-files | grep node_modules
+  666  git ls-files | grep config.js
+  667  git rm --cached config.js
+  668  git commit -m "Stop tracking config.js node_modules 2nd time"
+  669  git ls-files | grep config.js
+  670  git push origin main
+  672  history | grep git
+  673  git status
+  674  git add .
+  675  git commit -m "adding ssh note file"
+
