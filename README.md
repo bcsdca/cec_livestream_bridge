@@ -8,15 +8,18 @@ It works alongside the livestream scheduling system and integrates with Bitfocus
 
 * Monitor multiple livestreams (Cantonese/Mandarin/English/Join) services, simultaneously
 * Display real-time livestream status
+* Polling all streams status every 2 min(user configurable) to conserve youTube API call
 * Show concurrent viewer count when a stream is live
 * Support single/multiple joined stream status
 * Lightweight and efficient Node.js implementation
-* Seamless integration with Bitfocus Companion via OSC
-* It will use 4 buttons on page 6 of the Companion button tab, each button represent one service (This is done outside of the code) 
+* Seamless integration with Bitfocus Companion via OSC connection
+* (Below is done in companion setup and it is outside of this node js code) 
+* It will use 4 buttons on page 6 of the Companion button tab(Livestream Dashboard), each button represent one service status.
+* It is a feedback button only, the livestream status on each button is automatically refresh, and no action is required from the user.
 
-## Why OSC?
+## Why OSC connection?
 
-This project uses OSC (Open Sound Control) for communication with Bitfocus Companion because:
+This project uses OSC (Open Sound Control) connection for communication with Bitfocus Companion because:
 
 * It is simple and efficient
 * It supports real-time message updates
