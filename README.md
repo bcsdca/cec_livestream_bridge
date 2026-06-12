@@ -6,12 +6,13 @@ It works alongside the livestream scheduling system and integrates with Bitfocus
 
 ## Features
 
-* Monitor multiple livestream services simultaneously
+* Monitor multiple livestreams (Cantonese/Mandarin/English/Join) services, simultaneously
 * Display real-time livestream status
 * Show concurrent viewer count when a stream is live
 * Support single/multiple joined stream status
 * Lightweight and efficient Node.js implementation
 * Seamless integration with Bitfocus Companion via OSC
+* It will use 4 buttons on page 6 of the Companion button tab, each button represent one service (This is done outside of the code) 
 
 ## Why OSC?
 
