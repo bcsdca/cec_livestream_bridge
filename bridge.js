@@ -1,4 +1,4 @@
-// bridge.js (Smart Cached + Multi-Joint + Today Filter)
+// bridge.js (Smart Cached + Multi-Joint + Today Filter + Joint Cleanup + Console Video ID)
 
 const osc = require("osc");
 const { YOUTUBE_API_KEY, CHANNEL_ID, POLL_INTERVAL_MS } = require("./config");
@@ -43,7 +43,6 @@ function isTodayOrTomorrow(dateString) {
   if (!dateString) return false;
 
   const d = new Date(dateString).toDateString();
-
   return d === todayStr || d === tomorrowStr;
 }
 
@@ -100,7 +99,6 @@ async function searchForStream(lang) {
     const videoIds = (data.items || []).map(i => i.id.videoId).filter(Boolean);
     if (videoIds.length === 0) continue;
 
-    /* 🔥 GET DETAILS FOR DATE FILTER */
     const detailsUrl =
       `https://www.googleapis.com/youtube/v3/videos` +
       `?part=snippet,liveStreamingDetails` +
@@ -120,10 +118,8 @@ async function searchForStream(lang) {
       const videoId = video.id;
       const scheduled = video.liveStreamingDetails?.scheduledStartTime;
 
-      /* 🔥 TODAY or TOMORROW FILTER */
-      if (!isTodayOrTomorrow(scheduled)) continue; 
+      if (!isTodayOrTomorrow(scheduled)) continue;
 
-      /* 🔥 JOINT PRIORITY */
       if (title.includes("joint")) {
 
         if (lang === "joint" && !usedVideoIds.has(videoId)) {
@@ -134,7 +130,6 @@ async function searchForStream(lang) {
         continue;
       }
 
-      /* 🔥 NORMAL LANGUAGE */
       if (title.includes(lang) && !usedVideoIds.has(videoId)) {
         usedVideoIds.add(videoId);
         streamCache[lang] = videoId;
@@ -170,17 +165,23 @@ async function getVideoStatus(videoId) {
 }
 
 /* =============================== */
-function sendOSC(lang, value) {
+function sendOSC(lang, value, videoId = null) {
 
   udpPorts[lang].send({
     address: `/livestream/${lang}`,
     args: [{ type: "s", value }]
   });
 
+  let logLine = value.replace("\n", " | ");
+
+  if (videoId) {
+    logLine += ` | 🎥 ${videoId}`;
+  }
+
   console.log(
     new Date().toLocaleString(),
     `→ ${lang}:`,
-    value.replace("\n", " | ")
+    logLine
   );
 }
 
@@ -212,10 +213,19 @@ async function pollLivestream() {
 
       console.log("📦 Joint cache:", streamCache["joint"]);
 
+      const updatedJointCache = [];
+
       for (const vid of streamCache["joint"]) {
 
         const s = await getVideoStatus(vid);
         if (!s) continue;
+
+        if (s.state === "none") {
+          console.log(`🧹 Removing ended joint stream → ${vid}`);
+          continue;
+        }
+
+        updatedJointCache.push(vid);
 
         if (s.state === "live") {
           status = s;
@@ -227,6 +237,15 @@ async function pollLivestream() {
           status = s;
           selectedVideoId = vid;
         }
+      }
+
+      streamCache["joint"] = updatedJointCache;
+
+      if (streamCache["joint"].length === 0) {
+        console.log("🛑 All joint streams finished.");
+        sendOSC("joint", "none");
+        streamEnded["joint"] = true;
+        continue;
       }
 
       if (!status) {
@@ -268,7 +287,7 @@ async function pollLivestream() {
         });
       }
 
-      sendOSC(lang, `live\n👀 ${concurrent}`);
+      sendOSC(lang, `live\n👀 ${concurrent}`, selectedVideoId);
 
       if (!lockLogged[lang]) {
         console.log(`🔒 Locked ${lang} → ${selectedVideoId}`);
@@ -280,7 +299,7 @@ async function pollLivestream() {
       hasStarted = true;
       allNone = false;
 
-      sendOSC(lang, "upcoming");
+      sendOSC(lang, "upcoming", selectedVideoId);
 
       if (!lockLogged[lang]) {
         console.log(`🔒 Locked ${lang} → ${selectedVideoId}`);
@@ -305,7 +324,6 @@ async function pollLivestream() {
 
     if (allEnded) {
       console.log("✅ All streams finished. Exiting bridge.");
-
       setTimeout(() => process.exit(0), 500);
     }
   }

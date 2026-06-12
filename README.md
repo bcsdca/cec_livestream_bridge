@@ -6,7 +6,7 @@ Features
 	•	Monitor multiple livestream services simultaneously
 	•	Display real-time livestream status
 	•	Show concurrent viewer count when a stream is live
-	•	Provide Join control for available livestreams
+	•	Support single/multiple join streams status
 	•	Lightweight and efficient Node.js implementation
 	•	Seamless integration with Bitfocus Companion via OSC
 
